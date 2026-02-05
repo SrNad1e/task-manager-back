@@ -3,10 +3,15 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { TasksModule } from './tasks/tasks.module';
-import { ConfigModule } from '@nestjs/config';
+
+const mongoUri = process.env.MONGODB_URI;
+
+if (!mongoUri) {
+  throw new Error('MONGODB_URI is not defined');
+}
 
 @Module({
-  imports: [TasksModule, MongooseModule.forRoot('mongodb+srv://mrnobody:1gOh7xGBd8521r4w@taskmanagerdb.dmew8pv.mongodb.net/')],
+  imports: [TasksModule, MongooseModule.forRoot(mongoUri)],
   controllers: [AppController],
   providers: [AppService],
 })
