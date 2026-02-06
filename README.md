@@ -218,9 +218,11 @@ src/
 ├── dto/                     # Data Transfer Objects (validación)
 │   ├── create-task.dto.ts
 │   └── update-task.dto.ts
-├── schemas/                 # Esquemas MongoDB
-│   └── task.schema.ts
-└── tasks/                   # Feature module
+├── tasks/                   # Feature module
+│   └── schemas/             # Esquemas MongoDB del módulo tasks
+│       └── task.schema.ts
+└── (modules)                # Módulos de la aplicación
+  └── tasks/
     ├── tasks.controller.ts  # Endpoints HTTP
     ├── tasks.service.ts     # Lógica de negocio
     └── tasks.module.ts      # Configuración del módulo

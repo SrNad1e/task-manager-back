@@ -2,8 +2,8 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { TasksService } from './tasks.service';
 import { getModelToken } from '@nestjs/mongoose';
 import { Task } from './schemas/task.schema';
-import { CreateTaskDto } from '../dto/create-task.dto';
-import { UpdateTaskDto } from '../dto/update-task.dto';
+import { CreateTaskDto } from './dto/create-task.dto';
+import { UpdateTaskDto } from './dto/update-task.dto';
 
 describe('TasksService', () => {
   let service: TasksService;

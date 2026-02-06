@@ -1,19 +1,23 @@
-import { Controller, Delete, Param, Post, Put, Get, Body, HttpException, HttpStatus, BadRequestException, Logger } from '@nestjs/common';
+import { Controller, Delete, Param, Post, Put, Get, Body, HttpException, HttpStatus, BadRequestException, Logger, UseGuards } from '@nestjs/common';
 import { TasksService } from './tasks.service';
-import { CreateTaskDto } from 'src/dto/create-task.dto';
-import { UpdateTaskDto } from 'src/dto/update-task.dto';
+import { CreateTaskDto } from 'src/tasks/dto/create-task.dto';
+import { UpdateTaskDto } from 'src/tasks/dto/update-task.dto';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { CurrentUser } from 'src/auth/current-user.decorator';
+import { User } from 'src/users/schemas/user.schema';
 
 @Controller('tasks')
+@UseGuards(JwtAuthGuard)
 export class TasksController {
     private readonly logger = new Logger(TasksController.name);
 
     constructor(private tasksService: TasksService) { }
 
     @Get()
-    async findAll() {
+    async findAll(@CurrentUser() user: User) {
         try {
             this.logger.log('Obteniendo todas las tareas');
-            const tasks = await this.tasksService.findAll();
+            const tasks = await this.tasksService.findAll(user?._id?.toString());
             this.logger.debug(`Se encontraron ${tasks.length} tareas`);
             return tasks;
         } catch (error) {
@@ -26,17 +30,11 @@ export class TasksController {
     }
 
     @Get(':id')
-    async findOne(@Param('id') id: string) {
+    async findOne(@Param('id') id: string, @CurrentUser() user: User) {
         try {
             this.logger.log(`Buscando tarea con ID: ${id}`);
-            // Validar que el ID sea un MongoDB ObjectId válido
-            if (!this.isValidMongoId(id)) {
-                this.logger.warn(`ID de tarea inválido: ${id}`);
-                throw new BadRequestException('ID de tarea inválido');
-            }
+            const task = await this.tasksService.findOne(id, user?._id?.toString());
 
-            const task = await this.tasksService.findOne(id);
-            
             if (!task) {
                 this.logger.warn(`Tarea no encontrada con ID: ${id}`);
                 throw new HttpException(
@@ -60,7 +58,7 @@ export class TasksController {
     }
 
     @Post()
-    async create(@Body() createTaskDto: CreateTaskDto) {
+    async create(@Body() createTaskDto: CreateTaskDto, @CurrentUser() user: User) {
         try {
             this.logger.log(`Creando nueva tarea: ${createTaskDto.title}`);
             // Validar que el DTO no esté vacío
@@ -68,7 +66,7 @@ export class TasksController {
                 throw new BadRequestException('El cuerpo de la solicitud no puede estar vacío');
             }
 
-            const newTask = await this.tasksService.create(createTaskDto);
+            const newTask = await this.tasksService.create(createTaskDto, user?._id?.toString());
             this.logger.log(`Tarea creada exitosamente con ID: ${newTask._id}`);
             return newTask;
         } catch (error) {
@@ -92,16 +90,10 @@ export class TasksController {
     }
 
     @Delete(':id')
-    async remove(@Param('id') id: string) {
+    async remove(@Param('id') id: string, @CurrentUser() user: User) {
         try {
             this.logger.log(`Eliminando tarea con ID: ${id}`);
-            // Validar que el ID sea un MongoDB ObjectId válido
-            if (!this.isValidMongoId(id)) {
-                this.logger.warn(`ID de tarea inválido para eliminar: ${id}`);
-                throw new BadRequestException('ID de tarea inválido');
-            }
-
-            const deletedTask = await this.tasksService.delete(id);
+            const deletedTask = await this.tasksService.delete(id, user?._id?.toString());
 
             if (!deletedTask) {
                 this.logger.warn(`Intento de eliminar tarea no encontrada: ${id}`);
@@ -129,21 +121,15 @@ export class TasksController {
     }
 
     @Put(':id')
-    async update(@Param('id') id: string, @Body() updateTaskDto: UpdateTaskDto) {
+    async update(@Param('id') id: string, @Body() updateTaskDto: UpdateTaskDto, @CurrentUser() user: User) {
         try {
             this.logger.log(`Actualizando tarea con ID: ${id}`);
-            // Validar que el ID sea un MongoDB ObjectId válido
-            if (!this.isValidMongoId(id)) {
-                this.logger.warn(`ID de tarea inválido para actualizar: ${id}`);
-                throw new BadRequestException('ID de tarea inválido');
-            }
-
             // Validar que el DTO no esté vacío
             if (!updateTaskDto || Object.keys(updateTaskDto).length === 0) {
                 throw new BadRequestException('El cuerpo de la solicitud no puede estar vacío');
             }
 
-            const updatedTask = await this.tasksService.update(id, updateTaskDto);
+            const updatedTask = await this.tasksService.update(id, updateTaskDto, user?._id?.toString());
 
             if (!updatedTask) {
                 this.logger.warn(`Intento de actualizar tarea no encontrada: ${id}`);
@@ -177,8 +163,4 @@ export class TasksController {
         }
     }
 
-    // Función auxiliar para validar MongoDB ObjectId
-    private isValidMongoId(id: string): boolean {
-        return /^[0-9a-fA-F]{24}$/.test(id);
-    }
 }

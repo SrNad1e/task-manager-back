@@ -1,8 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { TasksController } from './tasks.controller';
 import { TasksService } from './tasks.service';
-import { CreateTaskDto } from '../dto/create-task.dto';
-import { UpdateTaskDto } from '../dto/update-task.dto';
+import { CreateTaskDto } from './dto/create-task.dto';
+import { UpdateTaskDto } from './dto/update-task.dto';
 import { BadRequestException, HttpException, HttpStatus } from '@nestjs/common';
 
 describe('TasksController', () => {
@@ -79,6 +79,9 @@ describe('TasksController', () => {
     });
 
     it('Debe lanzar BadRequestException si el ID es inválido', async () => {
+      // Arrange
+      mockTasksService.findOne.mockRejectedValue(new BadRequestException('ID de tarea inválido'));
+
       // Act & Assert
       await expect(controller.findOne('invalidId')).rejects.toThrow(BadRequestException);
     });
@@ -153,6 +156,9 @@ describe('TasksController', () => {
     });
 
     it('Debe lanzar BadRequestException si el ID es inválido', async () => {
+      // Arrange
+      mockTasksService.delete.mockRejectedValue(new BadRequestException('ID de tarea inválido'));
+
       // Act & Assert
       await expect(controller.remove('invalidId')).rejects.toThrow(BadRequestException);
     });
@@ -198,16 +204,4 @@ describe('TasksController', () => {
     });
   });
 
-  describe('isValidMongoId', () => {
-    it('Debe validar correctly MongoDB ObjectIds', () => {
-      // Test válidos
-      expect(controller['isValidMongoId']('507f1f77bcf86cd799439011')).toBe(true);
-      expect(controller['isValidMongoId']('507f1f77bcf86cd799439012')).toBe(true);
-
-      // Test inválidos
-      expect(controller['isValidMongoId']('invalidId')).toBe(false);
-      expect(controller['isValidMongoId']('123')).toBe(false);
-      expect(controller['isValidMongoId']('')).toBe(false);
-    });
-  });
 });

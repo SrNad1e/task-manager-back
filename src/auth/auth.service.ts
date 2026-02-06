@@ -9,7 +9,7 @@ export class AuthService {
   constructor(private usersService: UsersService, private jwtService: JwtService) {}
 
   async register(dto: RegisterDto) {
-    const user = await this.usersService.create(dto.email, dto.password);
+    const user = await this.usersService.create(dto);
     const payload = { sub: (user as any)._id, email: user.email };
     const accessToken = this.jwtService.sign(payload);
     return { accessToken, user };

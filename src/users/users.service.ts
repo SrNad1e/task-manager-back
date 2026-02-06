@@ -3,6 +3,8 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User } from './schemas/user.schema';
 import * as bcrypt from 'bcrypt';
+import { RegisterDto } from '../auth/dto/register.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UsersService {
@@ -12,11 +14,11 @@ export class UsersService {
 
   /**
    * Crear un nuevo usuario con contraseña hasheada
-   * @param email - Email del usuario
-   * @param password - Contraseña en texto plano (será hasheada)
+   * @param dto - Registro con email y password
    * @returns Usuario creado (sin contraseña)
    */
-  async create(email: string, password: string): Promise<User> {
+  async create(dto: RegisterDto): Promise<User> {
+    const { email, password } = dto;
     // Verificar si el usuario ya existe
     const existingUser = await this.userModel.findOne({ email });
     if (existingUser) {
@@ -24,11 +26,8 @@ export class UsersService {
       throw new ConflictException('El email ya está registrado');
     }
 
-    // Hashear la contraseña con bcrypt (10 rounds)
-    // Más rounds = más seguro pero más lento
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Crear el usuario en BD
     const newUser = new this.userModel({
       email,
       password: hashedPassword,
@@ -37,8 +36,29 @@ export class UsersService {
     const createdUser = await newUser.save();
     this.logger.log(`Usuario creado: ${email}`);
 
-    // IMPORTANTE: No retornar la contraseña
     return this.sanitizeUser(createdUser);
+  }
+
+  async update(id: string, dto: UpdateUserDto): Promise<User> {
+    const user = await this.userModel.findById(id).exec();
+    if (!user) {
+      throw new NotFoundException('Usuario no encontrado');
+    }
+
+    if (dto.email && dto.email !== user.email) {
+      const existing = await this.userModel.findOne({ email: dto.email }).exec();
+      if (existing) {
+        this.logger.warn(`Intento de actualizar usuario a email duplicado: ${dto.email}`);
+        throw new ConflictException('El email ya está registrado');
+      }
+    }
+
+    const updatePayload: any = {};
+    if (dto.email) updatePayload.email = dto.email;
+    if (dto.password) updatePayload.password = await bcrypt.hash(dto.password, 10);
+
+    const updated = await this.userModel.findByIdAndUpdate(id, updatePayload, { new: true }).exec();
+    return this.sanitizeUser(updated);
   }
 
   /**
