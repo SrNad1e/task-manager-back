@@ -8,9 +8,10 @@ async function bootstrap() {
   const logger = new Logger('Bootstrap');
   const app = await NestFactory.create(AppModule);
 
-  // Permitir llamadas del front en desarrollo
+  // Permitir llamadas del front configurado por env
+  const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
   app.enableCors({
-    origin: 'http://localhost:5173',
+    origin: frontendUrl,
   });
 
   // Filtro global para excepciones
