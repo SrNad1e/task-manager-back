@@ -8,6 +8,11 @@ async function bootstrap() {
   const logger = new Logger('Bootstrap');
   const app = await NestFactory.create(AppModule);
 
+  // Permitir llamadas del front en desarrollo
+  app.enableCors({
+    origin: 'http://localhost:5173',
+  });
+
   // Filtro global para excepciones
   app.useGlobalFilters(new AllExceptionsFilter());
 
