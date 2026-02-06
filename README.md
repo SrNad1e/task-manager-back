@@ -1,98 +1,352 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# 📋 Task Manager API
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+API REST profesional para gestión de tareas construida con **NestJS**, **MongoDB** y **TypeScript**. Diseñada como demostración de mejores prácticas modernas en desarrollo backend.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## 🎯 Características Principales
 
-## Description
+### ✅ Funcionalidades
+- **CRUD Completo** de tareas (Crear, Leer, Actualizar, Eliminar)
+- **Validación robusta** en dos capas (DTOs + Schema MongoDB)
+- **Manejo profesional de errores** con HTTP status codes apropiados
+- **Logging estructurado** con niveles (log, debug, warn, error)
+- **Health check endpoint** para monitoreo de producción
+- **Timestamps automáticos** (createdAt, updatedAt)
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+### 🔐 Buenas Prácticas
+- ✅ **Arquitectura modular** con separación de responsabilidades
+- ✅ **Validación de entrada** con `class-validator`
+- ✅ **Transformación de datos** con `class-transformer`
+- ✅ **Configuración segura** con variables de entorno
+- ✅ **Código limpio** y bien documentado
+- ✅ **TypeScript** para type-safety
 
-## Project setup
+---
 
-```bash
-$ npm install
-```
+## 🚀 Quick Start
 
-## Compile and run the project
+### Requisitos Previos
+- Node.js v18+
+- npm o yarn
+- MongoDB local o URI remota
+
+### Instalación
 
 ```bash
-# development
-$ npm run start
+# 1. Clonar repositorio
+git clone https://github.com/tu-usuario/task-manager-back.git
+cd task-manager-back
 
-# watch mode
-$ npm run start:dev
+# 2. Instalar dependencias
+npm install
 
-# production mode
-$ npm run start:prod
+# 3. Configurar variables de entorno
+cp .env.example .env
+# Editar .env con tu MONGODB_URI
 ```
 
-## Run tests
+### Variables de Entorno (.env)
+```env
+# MongoDB
+MONGODB_URI=mongodb+srv://usuario:contraseña@cluster.mongodb.net/task-manager
+
+# Server
+PORT=3000
+HOST=localhost
+```
+
+### Ejecutar Proyecto
 
 ```bash
-# unit tests
-$ npm run test
+# Desarrollo (watch mode)
+npm run start:dev
 
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+# Producción
+npm run start:prod
 ```
 
-## Deployment
+El servidor estará disponible en: **http://localhost:3000**
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+---
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+## 📚 Documentación de API
+
+### Endpoints Disponibles
+
+#### **GET** `/health` - Health Check
+Verifica que el servidor y MongoDB estén funcionando correctamente.
+
+**Respuesta (200 OK):**
+```json
+{
+  "status": "ok",
+  "message": "Servidor funcionando correctamente",
+  "timestamp": "2026-02-06T10:30:00.000Z",
+  "database": "connected",
+  "uptime": 123.45
+}
+```
+
+---
+
+#### **GET** `/tasks` - Obtener todas las tareas
+Lista todas las tareas registradas.
+
+**Respuesta (200 OK):**
+```json
+[
+  {
+    "_id": "507f1f77bcf86cd799439011",
+    "title": "Aprender NestJS",
+    "description": "Dominar el framework NestJS",
+    "completed": false,
+    "createdAt": "2026-02-06T10:00:00.000Z",
+    "updatedAt": "2026-02-06T10:00:00.000Z"
+  }
+]
+```
+
+---
+
+#### **GET** `/tasks/:id` - Obtener tarea por ID
+Recupera una tarea específica.
+
+**Respuesta (200 OK):**
+```json
+{
+  "_id": "507f1f77bcf86cd799439011",
+  "title": "Aprender NestJS",
+  "description": "Dominar el framework NestJS",
+  "completed": false,
+  "createdAt": "2026-02-06T10:00:00.000Z",
+  "updatedAt": "2026-02-06T10:00:00.000Z"
+}
+```
+
+**Errores:**
+- `400` - ID inválido
+- `404` - Tarea no encontrada
+
+---
+
+#### **POST** `/tasks` - Crear nueva tarea
+
+**Body:**
+```json
+{
+  "title": "Aprender NestJS",
+  "description": "Dominar el framework NestJS",
+  "completed": false
+}
+```
+
+**Validaciones:**
+- `title`: Requerido, 3-100 caracteres
+- `description`: Opcional, máximo 500 caracteres
+- `completed`: Opcional, debe ser boolean
+
+**Respuesta (201 Created):**
+```json
+{
+  "_id": "507f1f77bcf86cd799439011",
+  "title": "Aprender NestJS",
+  "description": "Dominar el framework NestJS",
+  "completed": false,
+  "createdAt": "2026-02-06T10:00:00.000Z",
+  "updatedAt": "2026-02-06T10:00:00.000Z"
+}
+```
+
+**Errores:**
+- `400` - Validación fallida
+- `409` - Título duplicado
+
+---
+
+#### **PUT** `/tasks/:id` - Actualizar tarea
+
+**Body:**
+```json
+{
+  "title": "Aprender NestJS avanzado",
+  "completed": true
+}
+```
+
+**Respuesta (200 OK):**
+```json
+{
+  "message": "Tarea actualizada correctamente",
+  "data": {
+    "_id": "507f1f77bcf86cd799439011",
+    "title": "Aprender NestJS avanzado",
+    "description": "Dominar el framework NestJS",
+    "completed": true,
+    "createdAt": "2026-02-06T10:00:00.000Z",
+    "updatedAt": "2026-02-06T11:00:00.000Z"
+  }
+}
+```
+
+---
+
+#### **DELETE** `/tasks/:id` - Eliminar tarea
+
+**Respuesta (200 OK):**
+```json
+{
+  "message": "Tarea eliminada correctamente",
+  "data": {
+    "_id": "507f1f77bcf86cd799439011",
+    "title": "Aprender NestJS",
+    "description": "Dominar el framework NestJS",
+    "completed": false,
+    "createdAt": "2026-02-06T10:00:00.000Z",
+    "updatedAt": "2026-02-06T10:00:00.000Z"
+  }
+}
+```
+
+---
+
+## 🏗️ Arquitectura
+
+```
+src/
+├── app.controller.ts        # Health check endpoint
+├── app.module.ts            # Módulo raíz (configuración global)
+├── main.ts                  # Entry point
+├── dto/                     # Data Transfer Objects (validación)
+│   ├── create-task.dto.ts
+│   └── update-task.dto.ts
+├── schemas/                 # Esquemas MongoDB
+│   └── task.schema.ts
+└── tasks/                   # Feature module
+    ├── tasks.controller.ts  # Endpoints HTTP
+    ├── tasks.service.ts     # Lógica de negocio
+    └── tasks.module.ts      # Configuración del módulo
+```
+
+### Flujo de una Solicitud
+
+```
+Usuario (HTTP Request)
+    ↓
+Controller (Validación de entrada)
+    ↓
+Service (Lógica de negocio)
+    ↓
+MongoDB (Persistencia)
+    ↓
+Response (JSON)
+```
+
+---
+
+## 🧪 Testing (Próximamente)
 
 ```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+# Unit tests
+npm run test
+
+# E2E tests
+npm run test:e2e
+
+# Coverage
+npm run test:cov
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+---
 
-## Resources
+## 📦 Stack Tecnológico
 
-Check out a few resources that may come in handy when working with NestJS:
+| Tecnología | Versión | Propósito |
+|------------|---------|----------|
+| NestJS | ^11.0 | Framework web |
+| MongoDB | ^9.1.6 | Base de datos NoSQL |
+| Mongoose | ^11.0.4 | ODM para MongoDB |
+| TypeScript | ^5.x | Lenguaje con tipos |
+| class-validator | ^0.14 | Validación de DTOs |
+| class-transformer | ^0.5 | Transformación de datos |
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+---
 
-## Support
+## 🔒 Seguridad & Mejores Prácticas
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+- ✅ **Validación en dos capas:** DTOs + Schema MongoDB
+- ✅ **Passwords y secretos en .env** (nunca en código)
+- ✅ **HTTP status codes correctos** para cada situación
+- ✅ **Mensajes de error genéricos** en producción
+- ✅ **Logging de actividadades sospechosas**
+- ✅ **Sanitización de entrada** automática
 
-## Stay in touch
+---
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+## 📊 Respuestas de Error
 
-## License
+Todos los errores siguen este formato:
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+```json
+{
+  "statusCode": 400,
+  "message": "Descripción del error",
+  "error": "Bad Request"
+}
+```
+
+| Status | Significado |
+|--------|-------------|
+| `200 OK` | Éxito |
+| `201 Created` | Recurso creado exitosamente |
+| `400 Bad Request` | Solicitud inválida (validación fallida) |
+| `404 Not Found` | Recurso no encontrado |
+| `409 Conflict` | Conflicto (e.g., duplicado) |
+| `500 Internal Server Error` | Error del servidor |
+| `503 Service Unavailable` | MongoDB desconectado |
+
+---
+
+## 🚀 Deployment
+
+### Docker (Próximamente)
+```bash
+docker build -t task-manager-api .
+docker run -p 3000:3000 task-manager-api
+```
+
+### Environment Variables para Producción
+```env
+NODE_ENV=production
+PORT=3000
+MONGODB_URI=mongodb+srv://usuario:contraseña@cluster.mongodb.net/task-manager
+```
+
+---
+
+## 📝 Licencia
+
+MIT - Libre para usar en proyectos personales y comerciales
+
+---
+
+## 💡 Notas del Desarrollo
+
+Este proyecto fue creado como portafolio profesional demostrando:
+
+- Arquitectura limpia y modular
+- Best practices de NestJS 11+
+- Manejo robusto de errores
+- Validación en múltiples capas
+- Logging profesional
+- Code organization y estructura clara
+
+**Ideal para:** Entrevistas técnicas, portfolios, demostración de habilidades backend
+
+---
+
+## 📞 Contacto
+
+Para preguntas o sugerencias: [Tu email/LinkedIn]
+
+---
+
+**Última actualización:** 6 de febrero de 2026

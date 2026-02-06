@@ -1,18 +1,30 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { TasksModule } from './tasks/tasks.module';
 
-const mongoUri = process.env.MONGODB_URI;
-
-if (!mongoUri) {
-  throw new Error('MONGODB_URI is not defined');
-}
-
 @Module({
-  imports: [TasksModule, MongooseModule.forRoot(mongoUri)],
-  controllers: [AppController],
-  providers: [AppService],
+  imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: '.env',
+    }),
+    MongooseModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => {
+        const mongoUri = configService.get<string>('MONGODB_URI');
+        if (!mongoUri) {
+          throw new Error('MONGODB_URI is not defined');
+        }
+        return {
+          uri: mongoUri,
+        };
+      },
+    }),
+    TasksModule,
+  ],
+  controllers: [],
+  providers: [],
 })
 export class AppModule { }
